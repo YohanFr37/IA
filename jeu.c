@@ -34,20 +34,15 @@ typedef struct EtatSt
 
 	int joueur; // à qui de jouer ?
 
-	// TODO: à compléter par la définition de l'état du jeu
-
-	/* par exemple, pour morpion: */
-	int pile[7];
-	char plateau[6][7];
+	//Pour le puissance 4
+	int pile[7]; //Création de 7 piles pour chaque colonne (permettra d'avoir le numéro de ligne pour poser un pion)
+	char plateau[6][7]; //Taille du plateau (6 ligne et 7 colonnes)
 
 } Etat;
 
 // Definition du type Coup
 typedef struct
 {
-	// TODO: à compléter par la définition d'un coup
-
-	/* par exemple, pour morpion: */
 	int ligne;
 	int colonne;
 
@@ -60,15 +55,11 @@ Etat *copieEtat(Etat *src)
 
 	etat->joueur = src->joueur;
 
-	// TODO: à compléter avec la copie de l'état src dans etat
-
-	/* par exemple : */
 	int i, j;
 	for (i = 0; i < 7; i++)
 		etat->pile[i] = src->pile[i];
 	for (i = 0; i < 6; i++)
 		for (j = 0; j < 7; j++)
-			// etat->pile[i] = src->pile[i];
 			etat->plateau[i][j] = src->plateau[i][j];
 	return etat;
 }
@@ -78,24 +69,18 @@ Etat *etat_initial(void)
 {
 	Etat *etat = (Etat *)malloc(sizeof(Etat));
 
-	// TODO: à compléter avec la création de l'état initial
-
-	/* par exemple : */
 	int i, j;
 	for (i = 0; i < 7; i++)
-		etat->pile[i] = 5;
+		etat->pile[i] = 5; //Numéro de ligne ou le pion sera posé, initialement à la ligne la plus basse
 	for (i = 0; i < 6; i++)
 		for (j = 0; j < 7; j++)
-			etat->plateau[i][j] = ' ';
+			etat->plateau[i][j] = ' '; //Initialisation de chaque case du plateau
 	return etat;
 }
 
 void afficheJeu(Etat *etat)
 {
 
-	// TODO: à compléter
-
-	/* par exemple : */
 	int i, j;
 	printf("   |");
 	for (j = 0; j < 7; j++)
@@ -116,16 +101,12 @@ void afficheJeu(Etat *etat)
 }
 
 // Nouveau coup
-// TODO: adapter la liste de paramètres au jeu
 Coup *nouveauCoup(int i, Etat *etat)
 {
 	Coup *coup = (Coup *)malloc(sizeof(Coup));
 
-	// TODO: à compléter avec la création d'un nouveau coup
-
-	/* par exemple : */
-	coup->ligne = etat->pile[i];
-	coup->colonne = i;
+	coup->ligne = etat->pile[i]; //Prend le numéro de la ligne
+	coup->colonne = i; //Prend le numéro de la colonne
 	return coup;
 }
 
@@ -133,16 +114,11 @@ Coup *nouveauCoup(int i, Etat *etat)
 Coup *demanderCoup(Etat *etat)
 {
 
-	// TODO...
-
-	/* par exemple : */
-	int i, j;
-	// printf("\n quelle ligne ? ") ;
-	// scanf("%d",&i);
+	int colonne;
 	printf(" quelle colonne ? ");
-	scanf("%d", &i);
+	scanf("%d", &colonne);
 
-	return nouveauCoup(i, etat);
+	return nouveauCoup(colonne, etat);
 }
 
 // Modifier l'état en jouant un coup
@@ -175,19 +151,16 @@ Coup **coups_possibles(Etat *etat)
 
 	int k = 0;
 
-	// TODO: à compléter
 
-	/* par exemple */
 	int i, j;
 	for (i = 0; i < 7; i++)
 	{
-		if (etat->plateau[0][i] == ' ')
+		if (etat->plateau[0][i] == ' ') //Si la colonne choisie n'est pas remplie entièrement
 		{
-			coups[k] = nouveauCoup(i, etat);
+			coups[k] = nouveauCoup(i, etat); //Joue un nouveau coup
 			k++;
 		}
 	}
-	/* fin de l'exemple */
 
 	coups[k] = NULL;
 
@@ -212,25 +185,6 @@ typedef struct NoeudSt
 	int nb_simus;
 
 } Noeud;
-
-Noeud * noeudRacine (Etat * etat) {
-	Noeud * noeud = (Noeud *)malloc(sizeof(Noeud));
-	
-	noeud->etat = copieEtat (etat);
-	noeud->coup = NULL;			
-	noeud->joueur = 1;		
-
-	
-	noeud->parent = NULL;
-	noeud->nb_enfants = 0; 
-	
-	// POUR MCTS:
-	noeud->nb_victoires = 0;
-	noeud->nb_simus = 0;	
-	
-
-	return noeud; 	
-}
 
 // Créer un nouveau noeud en jouant un coup à partir d'un parent
 // utiliser nouveauNoeud(NULL, NULL) pour créer la racine
@@ -292,10 +246,6 @@ void freeNoeud(Noeud *noeud)
 FinDePartie testFin(Etat *etat)
 {
 
-	// TODO...
-
-	/* par exemple	*/
-
 	// tester si un joueur a gagné
 	int i, j, k, n = 0;
 	for (i = 0; i < 6; i++)
@@ -337,7 +287,7 @@ FinDePartie testFin(Etat *etat)
 	}
 
 	// et sinon tester le match nul
-	if (n == 6 * 7)
+	if (n == 6 * 7) //Lorsque le plateau est remplie entièrement
 		return MATCHNUL;
 
 	return NON;
@@ -353,87 +303,69 @@ void ordijoue_mcts(Etat *etat, int tempsmax)
 	int temps;
 
 	Coup **coups;
-	Coup * meilleur_coup;
+	Coup *meilleur_coup;
 
 	// Créer l'arbre de recherche
-	//Noeud *racine = nouveauNoeud(NULL, NULL);
-	//racine->etat = copieEtat(etat);
-	Noeud * racine = noeudRacine(etat);	
+	Noeud *racine = nouveauNoeud(NULL, NULL);
+	racine->etat = copieEtat(etat);
 	// créer les premiers noeuds:
 	coups = coups_possibles(racine->etat);
 	Noeud *enfant;
-	//meilleur_coup = coups[rand() % k]; // choix aléatoire
-
-	//  TODO :
-	//	- supprimer la sélection aléatoire du meilleur coup ci-dessus
-	//	- implémenter l'algorithme MCTS-UCT pour déterminer le meilleur coup ci-dessous
 
 	int iter = 0;
-	//int meilleur_Noeud = 0;
-	Coup * meilleur_Noeud ;
 	do
 	{
-		Noeud * noeudActuel = racine;
+		Noeud *noeudActuel = racine;
 		FinDePartie fin_de_partie = testFin(noeudActuel->etat);
-		while(fin_de_partie == NON){
+		while (fin_de_partie == NON)
+		{
 			noeudActuel->nb_simus++;
-			if(noeudActuel->nb_enfants == 0){
-				Coup ** coup_possible = coups_possibles(noeudActuel->etat);
+			if (noeudActuel->nb_enfants == 0)
+			{
+				Coup **coup_possible = coups_possibles(noeudActuel->etat);
 				int nbCoup = 0;
-				while(coup_possible[nbCoup] != NULL){
-					//Coup* _fils = coup_possible[nbCoup];
+				while (coup_possible[nbCoup] != NULL)
+				{
+					// Coup* _fils = coup_possible[nbCoup];
 					ajouterEnfant(noeudActuel, coup_possible[nbCoup]);
 					nbCoup++;
 				}
 			}
-			float B = -500;
-			int maxi = 0;
-			int i=0;
-			for(i;i< noeudActuel->nb_enfants;i++){
-				if(noeudActuel->enfants[i]->nb_simus == 0){
-					maxi = i;
+			float B = -1;
+			int numNoeud = 0;
+			int i = 0;
+			for (i; i < noeudActuel->nb_enfants; i++)
+			{
+				if (noeudActuel->enfants[i]->nb_simus == 0) //Si un noeud n'a pas été fait par l'ordi
+				{
+					numNoeud = i;
 					break;
-					//B = B_Noeud;
 				}
-				
-					float muValeur = (float)noeudActuel->enfants[i]->nb_victoires/(float)noeudActuel->enfants[i]->nb_simus;
-					if(noeudActuel->joueur == 0){//humain
-						muValeur = -muValeur;
-					}
-					float B_Noeud = muValeur + C *sqrt((float)log2(noeudActuel->nb_simus)/(float)noeudActuel->enfants[i]->nb_simus);
-					//printf("B %d", B_Noeud);
-					if(B_Noeud > B){
-						maxi = i;
-						B = B_Noeud;
-					} 
-				/*if(noeudActuel->enfants[i]->nb_simus != 0){
-					int muValeur = noeudActuel->enfants[i]->nb_victoires/noeudActuel->enfants[i]->nb_simus;
-					if(noeudActuel->joueur == 0) //humain
-						muValeur = -muValeur;
-					int B_Noeud = muValeur + C * sqrt(log2(noeudActuel->nb_simus)/noeudActuel->enfants[i]->nb_simus);
-					//printf("B %d", B_Noeud);
-					if(B_Noeud > B){
-						maxi = i;
-						B = B_Noeud;
-					}
-				} else {
-					maxi = i;
-					break;
-					//B = B_Noeud;
-				}*/
+
+				float muValeur = (float)noeudActuel->enfants[i]->nb_victoires / (float)noeudActuel->enfants[i]->nb_simus; // μ dans la formule du MCTS
+				if (noeudActuel->joueur != 0)
+				{
+					muValeur = -muValeur;
+				}
+				float B_Noeud = muValeur + C * sqrt((float)log2(noeudActuel->nb_simus) / (float)noeudActuel->enfants[i]->nb_simus); // B(i) dans la formule
+				if (B_Noeud > B)
+				{
+					numNoeud = i;
+					B = B_Noeud;
+				}
 			}
 
-			noeudActuel = noeudActuel->enfants[maxi]; 
-			fin_de_partie = testFin(noeudActuel->etat);
+			noeudActuel = noeudActuel->enfants[numNoeud];
+			fin_de_partie = testFin(noeudActuel->etat);//Vérifie si l'un des deux joueurs a gagnés
 		}
-		if(fin_de_partie == ORDI_GAGNE){
-			while(noeudActuel != NULL){
-				noeudActuel->nb_victoires++;
-				noeudActuel = noeudActuel->parent;
+		if (fin_de_partie == ORDI_GAGNE) //Lorsque que dans une simulation l'ordination gagne
+		{
+			while (noeudActuel != NULL)
+			{
+				noeudActuel->nb_victoires++; //incrémente le nombre de victoire à 1 sur les noeud dans le chemin choisi par l'ordinateur
+				noeudActuel = noeudActuel->parent; //Remonte le chemin jusqu'au noeud actuel
 			}
 		}
-
-		// à compléter par l'algorithme MCTS-UCT...
 
 		toc = clock();
 		temps = (int)(((double)(toc - tic)) / CLOCKS_PER_SEC);
@@ -442,25 +374,22 @@ void ordijoue_mcts(Etat *etat, int tempsmax)
 	int nbVictoire;
 	int nbSimus;
 	float ratio;
-	float meilleurRatio = 0;
 	int meilleurNoeud = 0;
 	int meilleurNoeudNum = 0;
-	for(int v = 0; v< racine->nb_enfants;v++){
-		nbVictoire = racine->enfants[v]->nb_victoires;
-		nbSimus = racine->enfants[v]->nb_simus;
-		//ratio = nbVictoire/nbSimus;
-		printf("simus %d", nbSimus);
-		/*if(ratio > meilleurRatio){
-			meilleurNoeud = v;
-		}*/
-		if(nbSimus > meilleurNoeudNum){
-			meilleurNoeud = v;
-			meilleurNoeudNum = nbSimus;
-		}
+	for (int numColonne = 0; numColonne < racine->nb_enfants; numColonne++) //Pour chaque colonne
+	{
+		nbVictoire = racine->enfants[numColonne]->nb_victoires; //Nombre de victoire sur un noeud
+		nbSimus = racine->enfants[numColonne]->nb_simus; //Nombre de simulation sur un noeud
+		ratio = (double)nbVictoire/nbSimus; //ratio entre le nombre de victoire et le nombre de simulation sur un même noeud
+		printf("colonne %d nbVictoire %d nbSimus %d ratio %f \n", numColonne, nbVictoire, nbSimus, ratio); //Affichage des données pou chaque colonne
 
+		if (nbVictoire > meilleurNoeudNum)
+		{
+			meilleurNoeud = numColonne; //Prend le numéro de la colonne
+			meilleurNoeudNum = nbVictoire; 
+		}
 	}
 	meilleur_coup = racine->enfants[meilleurNoeud]->coup;
-	/* fin de l'algorithme  */ 	//meilleur_coup = coups[meilleur_Noeud];
 	/* fin de l'algorithme  */
 
 	// Jouer le meilleur premier coup
