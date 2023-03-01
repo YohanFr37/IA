@@ -317,7 +317,7 @@ void ordijoue_mcts(Etat *etat, int tempsmax)
 	{
 		Noeud *noeudActuel = racine;
 		FinDePartie fin_de_partie = testFin(noeudActuel->etat);
-		while (fin_de_partie == NON)
+		while (fin_de_partie == NON)//Tant qu'il n'y a pas de gagnant ou que le plateau soit complet selon le cgemin emprunté par l'ordinateur
 		{
 			noeudActuel->nb_simus++;
 			if (noeudActuel->nb_enfants == 0)
@@ -362,8 +362,8 @@ void ordijoue_mcts(Etat *etat, int tempsmax)
 		{
 			while (noeudActuel != NULL)
 			{
-				noeudActuel->nb_victoires++; //incrémente le nombre de victoire à 1 sur les noeud dans le chemin choisi par l'ordinateur
-				noeudActuel = noeudActuel->parent; //Remonte le chemin jusqu'au noeud actuel
+				noeudActuel->nb_victoires++; //incrémente le nombre de victoire à 1 sur les noeuds dans le chemin choisi par l'ordinateur
+				noeudActuel = noeudActuel->parent; //Remonte le chemin jusqu'à la racine
 			}
 		}
 
@@ -375,18 +375,18 @@ void ordijoue_mcts(Etat *etat, int tempsmax)
 	int nbSimus;
 	float ratio;
 	int meilleurNoeud = 0;
-	int meilleurNoeudNum = 0;
+	float meilleurNoeudNum = 0;
 	for (int numColonne = 0; numColonne < racine->nb_enfants; numColonne++) //Pour chaque colonne
 	{
 		nbVictoire = racine->enfants[numColonne]->nb_victoires; //Nombre de victoire sur un noeud
 		nbSimus = racine->enfants[numColonne]->nb_simus; //Nombre de simulation sur un noeud
 		ratio = (double)nbVictoire/nbSimus; //ratio entre le nombre de victoire et le nombre de simulation sur un même noeud
-		printf("colonne %d nbVictoire %d nbSimus %d ratio %f \n", numColonne, nbVictoire, nbSimus, ratio); //Affichage des données pou chaque colonne
+		printf("colonne %d nbVictoire %d nbSimus %d ratio %f \n", numColonne, nbVictoire, nbSimus, ratio); //Affichage des données pour chaque colonne
 
 		if (nbVictoire > meilleurNoeudNum)
 		{
 			meilleurNoeud = numColonne; //Prend le numéro de la colonne
-			meilleurNoeudNum = nbVictoire; 
+			meilleurNoeudNum = nbSimus; 
 		}
 	}
 	meilleur_coup = racine->enfants[meilleurNoeud]->coup;
@@ -431,7 +431,7 @@ int main(void)
 		else
 		{
 			// tour de l'Ordinateur
-
+			
 			ordijoue_mcts(etat, TEMPS);
 		}
 
